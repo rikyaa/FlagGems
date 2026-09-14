@@ -20,6 +20,8 @@ Rules:
   2. Each name in 'for' must match the aten naming pattern:
      - Simple: <op_name> (e.g., "abs", "_reshape_alias")
      - Overloaded: <op_name>.<overload> (e.g., "div.Scalar_mode")
+     - Dunder entry points: the operator name may be wrapped in double
+       underscores (e.g., "__and__.Scalar", "__ixor__", "__rshift__.Tensor_out")
   3. If a static allowlist is available, validate names against it
   4. Non-aten operators (fused, vLLM, etc.) with 'for' set to 'None' string are acceptable
 
@@ -41,8 +43,9 @@ OPERATORS_YAML = Path("conf/operators.yaml")
 ATEN_ALLOWLIST_FILE = Path("conf/aten_op_allowlist.txt")
 
 # Pattern for valid aten operator names
-# Allows: word chars, dots for overloads, leading underscores
-ATEN_NAME_PATTERN = re.compile(r"^_?[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)?$")
+# Allows: word chars, dots for overloads, leading underscores (one or more, so
+# that dunder entry points such as "__and__.Scalar" are accepted)
+ATEN_NAME_PATTERN = re.compile(r"^_*[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)?$")
 
 
 def load_operators_yaml() -> dict[str, dict]:
