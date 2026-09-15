@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from backend_utils import VendorDescriptor  # noqa: E402
+import pytest
+import torch
 
-vendor_info = VendorDescriptor(
-    vendor_name="hygon",
-    device_name="cuda",
-    device_query_cmd="hy-smi",
-    triton_extra_name="hip",
-    tle_enabled=True,
-)
+from . import base, consts
 
-CUSTOMIZED_UNUSED_OPS = ()
 
-__all__ = ["*"]
+@pytest.mark.and_tensor
+def test_and_tensor():
+    bench = base.BinaryPointwiseBenchmark(
+        op_name="and_tensor",
+        torch_op=torch.ops.aten.__and__.Tensor,
+        dtypes=consts.INT_DTYPES + consts.BOOL_DTYPES,
+    )
+    bench.run()
